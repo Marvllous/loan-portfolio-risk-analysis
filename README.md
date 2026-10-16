@@ -184,7 +184,7 @@ Across the whole book, $383.08M of $636.68M has been repaid, a collection rate o
 | 2023 | $133.04M |
 | 2024 | $76.00M (January to June) |
 
-The book is not growing. It holds between $133M and $147M across four full years. The 2024 half year looks smaller at $76.00M, but the first half of the year carries 57.1% of annual lending because of the January peak. Adjusted for that, it annualises to $133.08M, inside the same range.
+The book is not growing. It holds between $133M and $147M across four full years. The 2024 half year looks smaller at $76.00M, but the first half of the year carries 57.1% of annual lending because of the January peak. Adjusted for that, it annualises to $133.09M, inside the same range.
 
 Within the year there is a clear cycle. Comparing full years only, 2020 to 2023, January is the strongest month at $51.73M and September the weakest at $40.82M, a 27% gap. The 2024 half year is excluded from that comparison because it contains a January and no September, and pooling it would overstate the gap.
 
