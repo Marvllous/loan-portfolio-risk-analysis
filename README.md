@@ -1,4 +1,4 @@
-# Horizon Trust Bank: Loan Portfolio Risk Analysis
+# Loan Portfolio Risk Analysis
 
 Power BI credit risk analysis for a mid-sized US commercial bank. 5,000 loans, $636.68M lent, 20 branches, and a management team that could not see where its money or its risk was sitting.
 
@@ -10,7 +10,7 @@ Power BI credit risk analysis for a mid-sized US commercial bank. 5,000 loans, $
 
 ## Business Problem
 
-Horizon Trust Bank lends across 8 US states through urban, retail and commercial branches, offering mortgage, small business, education, auto and personal loans.
+The bank lends across 8 US states through urban, retail and commercial branches, offering mortgage, small business, education, auto and personal loans.
 
 The book was growing. The data was not built to be analysed. Every loan record, every customer attribute, every branch and geographic detail sat in a single flat table of 37 columns. Nothing could be grouped, compared or drilled into without rebuilding the data each time.
 
@@ -69,7 +69,7 @@ Dimensions were built in Power Query by duplicating the source query, removing e
 | `STATE DIM` | One row per state | `StateID` |
 | `LOAN TYPE DIM` | One row per product | `LoanTypeID` |
 | `COLLATERAL TYPE DIM` | One row per collateral type | `CollateralTypeID` |
-| `CALENDER DIM` | One row per date | `Date` |
+| `CALENDAR DIM` | One row per date | `Date` |
 
 The fact table keeps five foreign keys plus the loan's own values and flags. Everything descriptive moved out.
 
@@ -80,11 +80,11 @@ The fact table keeps five foreign keys plus the loan's own values and flags. Eve
 Power BI cannot do time intelligence without a continuous date table, so I built one in DAX rather than relying on the disbursement dates already in the fact table.
 
 ```dax
-CALENDER DIM = CALENDAR(DATE(2020, 1, 1), DATE(2054, 12, 31))
+CALENDAR DIM = CALENDAR(DATE(2020, 1, 1), DATE(2054, 12, 31))
 
-Year = YEAR('CALENDER DIM'[Date])
-Month = FORMAT('CALENDER DIM'[Date], "mmmm")
-Quarter = "Q" & FORMAT('CALENDER DIM'[Date], "q")
+Year = YEAR('CALENDAR DIM'[Date])
+Month = FORMAT('CALENDAR DIM'[Date], "mmmm")
+Quarter = "Q" & FORMAT('CALENDAR DIM'[Date], "q")
 ```
 
 The range runs to 2054 because the longest mortgage in the book matures that year. A calendar that stops short of the data produces blanks in every time-based visual.
@@ -184,9 +184,11 @@ Across the whole book, $383.08M of $636.68M has been repaid, a collection rate o
 | 2023 | $133.04M |
 | 2024 | $76.00M (January to June) |
 
-The book is not growing. It holds between $133M and $147M across four full years, and the half year of 2024 annualises to the same range.
+The book is not growing. It holds between $133M and $147M across four full years. The 2024 half year looks smaller at $76.00M, but the first half of the year carries 57.1% of annual lending because of the January peak. Adjusted for that, it annualises to $133.08M, inside the same range.
 
-Within the year there is a clear cycle. January is the strongest month at $65.65M, September the weakest at $40.82M. A 61% gap that repeats across the period, and nothing in current planning reflects it.
+Within the year there is a clear cycle. Comparing full years only, 2020 to 2023, January is the strongest month at $51.73M and September the weakest at $40.82M, a 27% gap. The 2024 half year is excluded from that comparison because it contains a January and no September, and pooling it would overstate the gap.
+
+The pattern is also sharpening. The spread between the strongest and weakest month widens every year, from 1.49 times in 2020 to 1.71 times in 2023.
 
 ### Affluent customers carry half the book
 
@@ -322,7 +324,7 @@ The brief set five questions for profit and five for loss.
 | L1 | What does loan ageing look like in 30 day bands? | Balances cluster between 31 and 150 days. As at 23 September 2026, only $7.62M had seen a payment inside 30 days. |
 | L2 | Which branches have the highest default rates? | Naperville 6.56%, Tampa Bay 6.27%, Atlanta Peachtree 5.95%. Six branches sit above 5%. |
 | L3 | How does unpaid exposure vary across risk levels? | Medium holds $161.71M outstanding with no defaults. High holds $17.78M with all 209. |
-| L4 | How has default rate changed over time? | It rises across vintages: 3.43%, 4.37%, 4.66%, 3.81%, 5.06%. Newer loans fail more often despite less time to fail. |
+| L4 | How has default rate changed over time? | It trends upward, from 3.43% in 2020 to 5.06% in 2024, with a dip to 3.81% in 2023. Newer loans fail more often despite having had less time to fail. |
 | L5 | What is driving defaulted exposure? | Customer segment first, Mass Market at 93.8% of defaults. Product second, Small Business at four times the mortgage rate. Geography third and much weaker. |
 
 ---
@@ -339,15 +341,15 @@ The brief set five questions for profit and five for loss.
 
 **Separate outstanding balance from loss in reporting.** Mortgage holds 88% of the outstanding balance and under 10% of the failures. Reporting the two together sends capital and attention to the safest product in the book.
 
-**Plan capacity around the lending cycle.** A 61% swing between January and September is predictable and repeats annually.
+**Plan capacity around the lending cycle.** Across full years January runs 27% above September, and the spread between the strongest and weakest month has widened every year from 1.49 times to 1.71 times. The cycle is predictable and it is getting sharper, not flatter.
 
 ---
 
 ## Limitations
 
 - **Risk level cannot be used as a predictor.** Low and Medium carry a 0.00% default rate, so the field describes outcomes rather than anticipating them. Any conclusion drawn from it is descriptive.
-- **Outstanding balance is not loss.** The $253.60M figure is principal not yet due on a portfolio roughly 60% through its average term.
-- **Collateral type adds nothing independent.** Each product maps to exactly one collateral type across all 5,000 rows: Mortgage to Property, Auto to Vehicle, Education to Co-Signer, Small Business to Business Guarantee, Personal to Unsecured. A collateral view would restate the product view.
+- **Outstanding balance is not loss.** The $253.60M figure is principal not yet due. Weighted by loan value the portfolio is only about halfway through its average term, and mortgage, which holds 88% of the balance, is around a quarter of the way through. The collection rate of 60.17% measures repayment, not term progress, and the two should not be read as the same thing.
+- **Collateral type adds nothing independent.** Each product maps to exactly one collateral type across all 5,000 rows: Mortgage to Property, Auto to Vehicle, Education to Co-Signer or Deposit, Small Business to Business Guarantee, Personal to Unsecured. A collateral view would restate the product view.
 - **Average days without payment is a point in time figure.** It calculates against the current date, so it moves each day the file is opened.
 - **Disbursements stop on 30 June 2024.** The 2024 figures cover six months. They are not a drop in lending.
 
